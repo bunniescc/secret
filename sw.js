@@ -51,20 +51,22 @@ self.addEventListener('fetch', function (event) {
     if (pathname.startsWith('/asset/') || pathname.startsWith('asset/')) {
         return;
     }
-    if (pathname === '/secret/' || pathname === '/secret') {
-        pathname = "/secret/index.html";
+    if (pathname === BASE_DIR || pathname === BASE_DIR) {
+        pathname = "/index.html";
     }
     if (pathname.endsWith('/')) {
         pathname = pathname + "index.html";
     }
     headers.set('power-by', 'SecretPage');
+    let tmp = BASE_DIR + 'asset' + pathname.replace(BASE_DIR, '/') + '.spf';
     event.respondWith(new Promise((resolve, reject) => {
-        fetch(BASE_DIR + 'asset' + pathname.replace(BASE_DIR, '/') + '.spf').then(r => r.text()).then(r => {
+        fetch(tmp).then(r => r.text()).then(r => {
             let blob = new Blob([fromBase64(r)], {});
             resolve(new Response(blob, {headers: headers}))
         }).catch(err => {
             headers.set('content-type', 'text/html');
-            resolve(new Response([`<h1>404 Not Found</h1><p>Protocol: ${req.protocol}</p><p>Host: ${req.host}</p><p>Path: ${req.pathname}</p><p>Search: ${req.search}</p><p>Hash: ${req.hash}</p>`], {headers: headers}));
+            let errPage = `<h1>404 Not Found</h1><p>Protocol: ${req.protocol}</p><p>Host: ${req.host}</p><p>Path: ${req.pathname}</p><p>Fetch: ${tmp}</p><p>Search: ${req.search}</p><p>Hash: ${req.hash}</p>`;
+            resolve(new Response(new Blob([errPage], {}), {headers: headers}));
         });
     }));
 });

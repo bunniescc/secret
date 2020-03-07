@@ -19,7 +19,13 @@
         }
         navigator.serviceWorker.register(sw, {scope: scope}).then(res => {
             console.log('ServiceWorker Init');
-            reload();
+            if (location.href.indexOf('/_asset/') === -1) {
+                reload();
+            } else {
+                let err = document.createElement('h1');
+                err.innerText = '404 Not Found';
+                document.append(err);
+            }
         }).catch(err => {
             console.log('ServiceWorker Failed')
         })
