@@ -53,11 +53,12 @@ self.addEventListener('fetch', function (event) {
         req.pathname = req.pathname + "index.html";
     }
     headers.set('power-by', 'SecretPage');
-    event.respondWith(fetch('asset/' + req.pathname.replace('/secret/', '/') + '.spf').catch(err => {
-        let blob = new Blob(['404 Not Found'], {});
-        return new Response(blob, {headers: headers})
-    }).then(r => r.text()).then(r => {
-        let blob = new Blob([fromBase64(r)], {});
-        return new Response(blob, {headers: headers})
+    event.respondWith(new Promise((resolve, reject) => {
+        fetch('asset/' + req.pathname.replace('/secret/', '/') + '.spf').then(r => r.text()).then(r => {
+            let blob = new Blob([fromBase64(r)], {});
+            resolve(new Response(blob, {headers: headers}))
+        }).catch(err => {
+            resolve(new Response(['404 Not Found'], {headers: headers}));
+        });
     }));
 });
