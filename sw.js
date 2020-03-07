@@ -1,3 +1,5 @@
+const BASE_DIR = '/secret/';
+
 function getLocation(href) {
     var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/);
     return match && {
@@ -41,27 +43,28 @@ self.addEventListener('install', function (event) {
 
 self.addEventListener('fetch', function (event) {
     let req = getLocation(event.request.url);
-    console.log(req);
     if (event.request.url.endsWith('sw.js')) {
         return;
     }
     let headers = new Headers();
-    if (req.pathname.startsWith('/asset/') || req.pathname.startsWith('asset/')) {
+    let pathname = req.pathname;
+    if (pathname.startsWith('/asset/') || pathname.startsWith('asset/')) {
         return;
     }
-    if (req.pathname === '/secret/' || req.pathname === '/secret') {
-        req.pathname = "/secret/index.html";
+    if (pathname === '/secret/' || pathname === '/secret') {
+        pathname = "/secret/index.html";
     }
-    if (req.pathname.endsWith('/')) {
-        req.pathname = req.pathname + "index.html";
+    if (pathname.endsWith('/')) {
+        pathname = pathname + "index.html";
     }
     headers.set('power-by', 'SecretPage');
     event.respondWith(new Promise((resolve, reject) => {
-        fetch('asset/' + req.pathname.replace('/secret/', '/') + '.spf').then(r => r.text()).then(r => {
+        fetch(BASE_DIR + 'asset' + pathname.replace(BASE_DIR, '/') + '.spf').then(r => r.text()).then(r => {
             let blob = new Blob([fromBase64(r)], {});
             resolve(new Response(blob, {headers: headers}))
         }).catch(err => {
-            resolve(new Response(['404 Not Found'], {headers: headers}));
+            headers.set('content-type', 'text/html');
+            resolve(new Response([`<h1>404 Not Found</h1><p>Protocol: ${req.protocol}</p><p>Host: ${req.host}</p><p>Path: ${req.pathname}</p><p>Search: ${req.search}</p><p>Hash: ${req.hash}</p>`], {headers: headers}));
         });
     }));
 });
