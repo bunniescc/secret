@@ -1,5 +1,5 @@
 const BASE_DIR = '/secret/';
-const ASSET_DIR = '_asset';
+const ASSET_DIR = 'site_asset';
 
 function getLocation(href) {
     var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/);
