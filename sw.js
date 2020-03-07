@@ -1,4 +1,5 @@
 const BASE_DIR = '/secret/';
+const ASSET_DIR = '_asset';
 
 function getLocation(href) {
     var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/);
@@ -48,17 +49,17 @@ self.addEventListener('fetch', function (event) {
     }
     let headers = new Headers();
     let pathname = req.pathname;
-    if (pathname.startsWith('/asset/') || pathname.startsWith('asset/')) {
+    if (pathname.startsWith('/' + ASSET_DIR) || pathname.startsWith(BASE_DIR + ASSET_DIR)) {
         return;
     }
-    if (pathname === BASE_DIR || pathname === BASE_DIR) {
+    if (pathname === BASE_DIR) {
         pathname = "/index.html";
     }
     if (pathname.endsWith('/')) {
         pathname = pathname + "index.html";
     }
     headers.set('power-by', 'SecretPage');
-    let tmp = BASE_DIR + '_asset' + pathname.replace(BASE_DIR, '/') + '.spf';
+    let tmp = BASE_DIR + ASSET_DIR + pathname.replace(BASE_DIR, '/') + '.spf';
     event.respondWith(new Promise((resolve, reject) => {
         fetch(tmp).then(r => r.text()).then(r => {
             let blob = new Blob([fromBase64(r)], {});
