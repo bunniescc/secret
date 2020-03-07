@@ -58,7 +58,7 @@ self.addEventListener('fetch', function (event) {
         pathname = pathname + "index.html";
     }
     headers.set('power-by', 'SecretPage');
-    let tmp = BASE_DIR + 'asset' + pathname.replace(BASE_DIR, '/') + '.spf';
+    let tmp = BASE_DIR + '_asset' + pathname.replace(BASE_DIR, '/') + '.spf';
     event.respondWith(new Promise((resolve, reject) => {
         fetch(tmp).then(r => r.text()).then(r => {
             let blob = new Blob([fromBase64(r)], {});
